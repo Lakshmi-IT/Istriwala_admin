@@ -4,11 +4,7 @@ import { SidebarProvider } from "./ui/sidebar";
 import { Button } from "./ui/button";
 import { Menu } from "lucide-react";
 
-interface AdminLayoutProps {
-  children: React.ReactNode;
-}
-
-export function AdminLayout({ children }: AdminLayoutProps) {
+export function AdminLayout({ children }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   return (

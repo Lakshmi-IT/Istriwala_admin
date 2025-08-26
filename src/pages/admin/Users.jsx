@@ -125,11 +125,11 @@ export default function Users() {
     },
   ];
 
-  const getStatusVariant = (status: string) => {
+  const getStatusVariant = (status) => {
     return status === "active" ? "default" : "secondary";
   };
 
-  const getInitials = (name: string) => {
+  const getInitials = (name) => {
     return name
       .split(" ")
       .map((word) => word[0])

@@ -91,7 +91,7 @@ export default function Orders() {
     },
   ];
 
-  const getStatusIcon = (status: string) => {
+  const getStatusIcon = (status) => {
     switch (status) {
       case "completed":
         return <CheckCircle className="h-4 w-4" />;
@@ -106,7 +106,7 @@ export default function Orders() {
     }
   };
 
-  const getStatusVariant = (status: string) => {
+  const getStatusVariant = (status) => {
     switch (status) {
       case "completed":
         return "default";

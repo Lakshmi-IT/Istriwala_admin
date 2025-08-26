@@ -113,7 +113,7 @@ export default function Payments() {
     },
   ];
 
-  const getStatusIcon = (status: string) => {
+  const getStatusIcon = (status) => {
     switch (status) {
       case "completed":
         return <CheckCircle className="h-4 w-4" />;
@@ -126,7 +126,7 @@ export default function Payments() {
     }
   };
 
-  const getStatusVariant = (status: string) => {
+  const getStatusVariant = (status) => {
     switch (status) {
       case "completed":
         return "default";
@@ -139,7 +139,7 @@ export default function Payments() {
     }
   };
 
-  const getMethodColor = (method: string) => {
+  const getMethodColor = (method) => {
     switch (method) {
       case "UPI":
         return "bg-success/10 text-success";
