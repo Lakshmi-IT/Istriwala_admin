@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -29,31 +29,12 @@ import {
   ArrowUpRight,
   DollarSign,
 } from "lucide-react";
+import axios from "axios";
 
 export default function Payments() {
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
-
-  const paymentStats = [
-    {
-      title: "Total Revenue",
-      value: "₹1,24,567",
-      change: "+12.5%",
-      icon: DollarSign,
-    },
-    {
-      title: "Pending Payments",
-      value: "₹8,450",
-      change: "-3.2%",
-      icon: Clock,
-    },
-    {
-      title: "Completed Today",
-      value: "₹5,670",
-      change: "+8.7%",
-      icon: CheckCircle,
-    },
-  ];
+  const [allPayments, setAllPayments] = useState([])
 
   const payments = [
     {
@@ -113,9 +94,11 @@ export default function Payments() {
     },
   ];
 
+
+
   const getStatusIcon = (status) => {
     switch (status) {
-      case "completed":
+      case "PAID":
         return <CheckCircle className="h-4 w-4" />;
       case "pending":
         return <Clock className="h-4 w-4" />;
@@ -128,7 +111,7 @@ export default function Payments() {
 
   const getStatusVariant = (status) => {
     switch (status) {
-      case "completed":
+      case "PAID":
         return "default";
       case "pending":
         return "secondary";
@@ -154,20 +137,66 @@ export default function Payments() {
     }
   };
 
-  const filteredPayments = payments.filter((payment) => {
-    const matchesSearch = 
+
+  useEffect(() => {
+    // const token = localStorage.getItem("token");
+    // if (!token) return;
+
+    const fetchOrders = async () => {
+      try {
+        const res = await axios.get("http://localhost:5000/api/orders/getAllOrders", {
+          // headers: { Authorization: `Bearer ${token}` },
+        });
+
+        const data = res.data.orders;
+        console.log(data, "data");
+
+  
+        if (res.data.success) {
+          const payments = data.map((order) => ({
+            id: order?.id ? order.id.replace("ORD", "PAY") : "PAY-000",
+            orderId: order?.id || "ORD-000",
+            customer: order?.customer || "N/A",
+            amount: order?.amount || "₹0",
+            method: order?.method || order?.paymentMethod || "RAZORPAY",
+            status: order?.status || "pending",
+            date: order?.date || "N/A",
+            time: order?.date
+              ? new Date(order.date).toLocaleTimeString([], {
+                hour: "2-digit",
+                minute: "2-digit",
+              })
+              : "00:00",
+            transactionId: order?.paymentId || "N/A",
+          }));
+
+          setAllPayments(payments); // set array, not single object
+        }
+
+      } catch (err) {
+        console.error("Failed to load orders:", err);
+      }
+    };
+
+    fetchOrders();
+  }, []);
+
+  const filteredPayments = allPayments.filter((payment) => {
+    const matchesSearch =
       payment.customer.toLowerCase().includes(searchTerm.toLowerCase()) ||
       payment.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
       payment.orderId.toLowerCase().includes(searchTerm.toLowerCase()) ||
       payment.transactionId.toLowerCase().includes(searchTerm.toLowerCase());
-    
+
     const matchesStatus = statusFilter === "all" || payment.status === statusFilter;
-    
+
     return matchesSearch && matchesStatus;
   });
 
+  console.log(allPayments, "allPayments")
+
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 lg:mb-0 mb-10">
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold text-admin-text-primary">Payments</h1>
@@ -182,42 +211,7 @@ export default function Payments() {
       </div>
 
       {/* Payment Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {paymentStats.map((stat) => (
-          <Card
-            key={stat.title}
-            className="bg-gradient-surface border-admin-border shadow-md hover:shadow-lg transition-all duration-200"
-          >
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-admin-text-secondary">
-                    {stat.title}
-                  </p>
-                  <p className="text-2xl font-bold text-admin-text-primary">
-                    {stat.value}
-                  </p>
-                  <div className="flex items-center gap-1 mt-2">
-                    <ArrowUpRight className={`h-3 w-3 ${
-                      stat.change.startsWith('+') ? 'text-success' : 'text-destructive'
-                    }`} />
-                    <span
-                      className={`text-xs ${
-                        stat.change.startsWith('+') ? 'text-success' : 'text-destructive'
-                      }`}
-                    >
-                      {stat.change}
-                    </span>
-                  </div>
-                </div>
-                <div className="p-3 rounded-lg bg-primary/10 text-primary">
-                  <stat.icon className="h-6 w-6" />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
+    
 
       {/* Filters */}
       <Card className="bg-gradient-surface border-admin-border shadow-md">
@@ -240,7 +234,7 @@ export default function Payments() {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">All Status</SelectItem>
-                  <SelectItem value="completed">Completed</SelectItem>
+                  <SelectItem value="PAID">PAID</SelectItem>
                   <SelectItem value="pending">Pending</SelectItem>
                   <SelectItem value="failed">Failed</SelectItem>
                 </SelectContent>
@@ -258,7 +252,7 @@ export default function Payments() {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="overflow-x-auto">
+          <div className="overflow-x-auto ">
             <Table>
               <TableHeader>
                 <TableRow>
@@ -268,16 +262,16 @@ export default function Payments() {
                   <TableHead>Amount</TableHead>
                   <TableHead>Method</TableHead>
                   <TableHead>Status</TableHead>
-                  <TableHead>Date & Time</TableHead>
+                  <TableHead>Date</TableHead>
                   <TableHead>Transaction ID</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {filteredPayments.map((payment) => (
-                  <TableRow key={payment.id} className="hover:bg-muted/50">
-                    <TableCell className="font-medium">{payment.id}</TableCell>
-                    <TableCell>
-                      <span className="px-2 py-1 bg-primary/10 text-primary rounded-md text-sm">
+                  <TableRow key={payment.id} className="hover:bg-muted/5">
+                    <TableCell className="  font-medium">{payment.id}</TableCell>
+                    <TableCell >
+                      <span className=" rounded-md text-sm w-[fit-content] ">
                         {payment.orderId}
                       </span>
                     </TableCell>
@@ -301,7 +295,7 @@ export default function Payments() {
                     <TableCell>
                       <div className="text-admin-text-secondary">
                         <p>{payment.date}</p>
-                        <p className="text-xs">{payment.time}</p>
+                        {/* <p className="text-xs">{payment.time}</p> */}
                       </div>
                     </TableCell>
                     <TableCell>

@@ -22,32 +22,27 @@ import {
 const menuItems = [
   {
     title: "Dashboard",
-    url: "/admin",
+    url: "/",
     icon: LayoutDashboard,
   },
   {
     title: "Orders",
-    url: "/admin/orders",
+    url: "/orders",
     icon: Package,
   },
   {
     title: "Payments",
-    url: "/admin/payments",
+    url: "/payments",
     icon: CreditCard,
   },
   {
     title: "Users",
-    url: "/admin/users",
+    url: "/users",
     icon: Users,
   },
   {
-    title: "Analytics",
-    url: "/admin/analytics",
-    icon: TrendingUp,
-  },
-  {
     title: "Profile Settings",
-    url: "/admin/profile",
+    url: "/profile",
     icon: Settings,
   },
 ];
@@ -61,13 +56,14 @@ export function AdminSidebar() {
       <SidebarContent>
         <div className="p-6 border-b border-admin-border">
           <div className="flex items-center gap-3">
-            <div className="h-8 w-8 rounded-lg bg-gradient-primary flex items-center justify-center">
-              <Package className="h-4 w-4 text-white" />
-            </div>
+            {/* <div className="h-8 w-8 rounded-lg bg-gradient-primary flex items-center justify-center"> */}
+              {/* <Package className="h-4 w-4 text-white" /> */}
+              <img src="/logo.png" alt="logo" className="h-10 w-10"/>
+            {/* </div> */}
             {!collapsed && (
               <div>
                 <h2 className="font-semibold text-admin-text-primary">
-                  Isthri Wala
+                  ISTRIWALA
                 </h2>
                 <p className="text-xs text-admin-text-secondary">Admin Panel</p>
               </div>
@@ -84,11 +80,11 @@ export function AdminSidebar() {
                   <SidebarMenuButton asChild>
                     <NavLink
                       to={item.url}
-                      end={item.url === "/admin"}
+                      end={item.url === "/"}
                       className={({ isActive }) =>
                         `flex items-center gap-3 px-3 py-2 rounded-lg transition-all duration-200 ${
                           isActive
-                            ? "bg-primary text-primary-foreground shadow-md"
+                            ? "bg-primary text-black shadow-md"
                             : "text-admin-text-secondary hover:bg-muted hover:text-admin-text-primary"
                         }`
                       }

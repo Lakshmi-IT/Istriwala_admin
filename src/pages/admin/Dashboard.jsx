@@ -10,97 +10,129 @@ import {
   ShoppingCart,
   CheckCircle,
 } from "lucide-react";
+import { useEffect, useState } from "react";
+import axios from "axios";
 
 export default function Dashboard() {
+
+  const [ordersData, setordersData] = useState([])
+  const [allUsers,setAllUsers]=useState([])
+
+
+  const totalRevenue = ordersData.reduce((sum, item) => {
+    return sum + Number(item.amount?.toString().replace(/[₹,]/g, "") || 0);
+  }, 0);
+
+
   const stats = [
     {
       title: "Total Orders",
-      value: "2,847",
-      change: "+12.5%",
+      value: ordersData?.length,
+      // change: "+12.5%",
       trend: "up",
       icon: Package,
       color: "text-primary",
     },
     {
       title: "Revenue",
-      value: "₹45,678",
-      change: "+8.3%",
-      trend: "up",
+      value: totalRevenue,
+      // change: "+8.3%",
+      // trend: "up",
       icon: DollarSign,
       color: "text-success",
     },
     {
       title: "Active Users",
-      value: "1,234",
-      change: "-2.1%",
-      trend: "down",
+      value: allUsers?.length,
+    
       icon: Users,
       color: "text-warning",
     },
-    {
-      title: "Growth Rate",
-      value: "18.7%",
-      change: "+5.4%",
-      trend: "up",
-      icon: TrendingUp,
-      color: "text-primary",
-    },
+
   ];
 
-  const recentOrders = [
-    {
-      id: "ORD-001",
-      customer: "Rajesh Kumar",
-      service: "Shirt Ironing (5 pieces)",
-      amount: "₹150",
-      status: "completed",
-      time: "2 hours ago",
-    },
-    {
-      id: "ORD-002",
-      customer: "Priya Sharma",
-      service: "Full Wardrobe Service",
-      amount: "₹450",
-      status: "in-progress",
-      time: "4 hours ago",
-    },
-    {
-      id: "ORD-003",
-      customer: "Amit Singh",
-      service: "Suit Pressing",
-      amount: "₹200",
-      status: "pending",
-      time: "6 hours ago",
-    },
-    {
-      id: "ORD-004",
-      customer: "Sunita Devi",
-      service: "Saree Ironing (3 pieces)",
-      amount: "₹180",
-      status: "completed",
-      time: "1 day ago",
-    },
-  ];
+ 
+
+  useEffect(() => {
+    // const token = localStorage.getItem("token");
+    // if (!token) return;
+
+    const fetchUsers = async () => {
+      try {
+        const res = await axios.get("http://localhost:5000/api/user/getAllUsersWithOrders", {
+          // headers: { Authorization: `Bearer ${token}` },
+        });
+
+        if (res.data.success) {
+          setAllUsers(res.data.users);
+        }
+      } catch (err) {
+        console.error("Failed to load orders:", err);
+      }
+    };
+
+    fetchUsers();
+  }, []);
+
+  useEffect(() => {
+    // const token = localStorage.getItem("token");
+    // if (!token) return;
+
+    const fetchOrders = async () => {
+      try {
+        const res = await axios.get("http://localhost:5000/api/orders/getAllOrders", {
+          // headers: { Authorization: `Bearer ${token}` },
+        });
+
+        const data = res.data.orders;
+        console.log(data, "data")
+
+        if (res.data.success) {
+          const payments = data.map((order) => ({
+            id: order?.id || "ORD-000",
+            customer: order?.customer || "N/A",
+            amount: order?.amount || "₹0",
+            method: order?.method || order?.paymentMethod || "RAZORPAY",
+            status: order?.status || "pending",
+            date: order?.date || "N/A",
+            service: order?.service || "N/A",
+            // qty: order.qty.map(i => `${i.qty}`).join(", "),
+
+            time: order?.date,
+            transactionId: order?.paymentId || "N/A",
+          }));
+
+          setordersData(payments); // set array, not single object
+        }
+
+      } catch (err) {
+        console.error("Failed to load orders:", err);
+      }
+    };
+
+    fetchOrders();
+  }, []);
+
+
+  console.log(ordersData, "ordersData")
+
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 lg:mb-0 mb-10">
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold text-admin-text-primary">
             Dashboard
           </h1>
           <p className="text-admin-text-secondary">
-            Welcome to your Isthri Wala admin panel
+            Welcome to your ISTRIWALA admin panel
           </p>
         </div>
-        <Button className="bg-gradient-primary border-0 shadow-glow">
-          <ShoppingCart className="h-4 w-4 mr-2" />
-          New Order
-        </Button>
+       
       </div>
 
       {/* Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {stats.map((stat) => (
           <Card
             key={stat.title}
@@ -115,20 +147,7 @@ export default function Dashboard() {
                   <p className="text-2xl font-bold text-admin-text-primary">
                     {stat.value}
                   </p>
-                  <div className="flex items-center gap-1 mt-2">
-                    {stat.trend === "up" ? (
-                      <ArrowUpRight className="h-3 w-3 text-success" />
-                    ) : (
-                      <ArrowDownRight className="h-3 w-3 text-destructive" />
-                    )}
-                    <span
-                      className={`text-xs ${
-                        stat.trend === "up" ? "text-success" : "text-destructive"
-                      }`}
-                    >
-                      {stat.change}
-                    </span>
-                  </div>
+
                 </div>
                 <div
                   className={`p-3 rounded-lg bg-primary/10 ${stat.color}`}
@@ -154,20 +173,19 @@ export default function Dashboard() {
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              {recentOrders.map((order) => (
+              {ordersData?.slice(0, 4)?.map((order) => (
                 <div
                   key={order.id}
                   className="flex items-center justify-between p-4 rounded-lg border border-admin-border hover:bg-muted/50 transition-colors"
                 >
                   <div className="flex items-center gap-3">
                     <div
-                      className={`p-2 rounded-full ${
-                        order.status === "completed"
-                          ? "bg-success/10 text-success"
-                          : order.status === "in-progress"
+                      className={`p-2 rounded-full ${order.status === "completed"
+                        ? "bg-success/10 text-success"
+                        : order.status === "in-progress"
                           ? "bg-warning/10 text-warning"
                           : "bg-muted text-admin-text-secondary"
-                      }`}
+                        }`}
                     >
                       {order.status === "completed" ? (
                         <CheckCircle className="h-4 w-4" />
@@ -192,13 +210,12 @@ export default function Dashboard() {
                       {order.amount}
                     </p>
                     <span
-                      className={`text-xs px-2 py-1 rounded-full ${
-                        order.status === "completed"
-                          ? "bg-success/10 text-success"
-                          : order.status === "in-progress"
+                      className={`text-xs px-2 py-1 rounded-full ${order.status === "completed"
+                        ? "bg-success/10 text-success"
+                        : order.status === "in-progress"
                           ? "bg-warning/10 text-warning"
                           : "bg-muted text-admin-text-secondary"
-                      }`}
+                        }`}
                     >
                       {order.status.replace("-", " ")}
                     </span>
@@ -210,7 +227,7 @@ export default function Dashboard() {
         </Card>
 
         {/* Quick Actions */}
-        <Card className="bg-gradient-surface border-admin-border shadow-md">
+        {/* <Card className="bg-gradient-surface border-admin-border shadow-md">
           <CardHeader>
             <CardTitle className="text-admin-text-primary">
               Quick Actions
@@ -234,7 +251,7 @@ export default function Dashboard() {
               View Analytics
             </Button>
           </CardContent>
-        </Card>
+        </Card> */}
       </div>
     </div>
   );

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -31,103 +31,18 @@ import {
   Users as UsersIcon,
   Star,
 } from "lucide-react";
+import axios from "axios";
 
 export default function Users() {
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
+  const [allUsers,setAllUsers]=useState([])
 
-  const userStats = [
-    {
-      title: "Total Users",
-      value: "1,234",
-      change: "+5.2%",
-      icon: UsersIcon,
-    },
-    {
-      title: "Active Users",
-      value: "987",
-      change: "+8.1%",
-      icon: UsersIcon,
-    },
-    {
-      title: "New This Month",
-      value: "156",
-      change: "+12.3%",
-      icon: UserPlus,
-    },
-  ];
 
-  const users = [
-    {
-      id: "USR-001",
-      name: "Rajesh Kumar",
-      email: "rajesh.kumar@email.com",
-      phone: "+91 98765 43210",
-      address: "123 Main Street, Delhi",
-      totalOrders: 15,
-      totalSpent: "₹2,450",
-      lastOrder: "2024-01-15",
-      status: "active",
-      rating: 4.8,
-      joinDate: "2023-06-15",
-    },
-    {
-      id: "USR-002",
-      name: "Priya Sharma",
-      email: "priya.sharma@email.com",
-      phone: "+91 87654 32109",
-      address: "456 Park Avenue, Mumbai",
-      totalOrders: 28,
-      totalSpent: "₹4,780",
-      lastOrder: "2024-01-14",
-      status: "active",
-      rating: 4.9,
-      joinDate: "2023-03-22",
-    },
-    {
-      id: "USR-003",
-      name: "Amit Singh",
-      email: "amit.singh@email.com",
-      phone: "+91 76543 21098",
-      address: "789 Garden Road, Bangalore",
-      totalOrders: 7,
-      totalSpent: "₹1,120",
-      lastOrder: "2024-01-10",
-      status: "inactive",
-      rating: 4.5,
-      joinDate: "2023-11-08",
-    },
-    {
-      id: "USR-004",
-      name: "Sunita Devi",
-      email: "sunita.devi@email.com",
-      phone: "+91 65432 10987",
-      address: "321 Temple Street, Chennai",
-      totalOrders: 22,
-      totalSpent: "₹3,890",
-      lastOrder: "2024-01-12",
-      status: "active",
-      rating: 5.0,
-      joinDate: "2023-02-14",
-    },
-    {
-      id: "USR-005",
-      name: "Mohammad Ali",
-      email: "mohammad.ali@email.com",
-      phone: "+91 54321 09876",
-      address: "654 Market Road, Hyderabad",
-      totalOrders: 3,
-      totalSpent: "₹540",
-      lastOrder: "2024-01-05",
-      status: "inactive",
-      rating: 4.2,
-      joinDate: "2023-12-01",
-    },
-  ];
 
-  const getStatusVariant = (status) => {
-    return status === "active" ? "default" : "secondary";
-  };
+
+
+
 
   const getInitials = (name) => {
     return name
@@ -137,7 +52,7 @@ export default function Users() {
       .toUpperCase();
   };
 
-  const filteredUsers = users.filter((user) => {
+  const filteredUsers = allUsers.filter((user) => {
     const matchesSearch = 
       user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -149,8 +64,35 @@ export default function Users() {
     return matchesSearch && matchesStatus;
   });
 
+
+
+    useEffect(() => {
+    // const token = localStorage.getItem("token");
+    // if (!token) return;
+
+    const fetchUsers = async () => {
+      try {
+        const res = await axios.get("http://localhost:5000/api/user/getAllUsersWithOrders", {
+          // headers: { Authorization: `Bearer ${token}` },
+        });
+
+        if (res.data.success) {
+          setAllUsers(res.data.users);
+        }
+      } catch (err) {
+        console.error("Failed to load orders:", err);
+      }
+    };
+
+    fetchUsers();
+  }, []);
+
+  console.log(allUsers,"allUsers")
+
+
+
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 lg:mb-0 mb-10">
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold text-admin-text-primary">Users</h1>
@@ -164,36 +106,7 @@ export default function Users() {
         </Button>
       </div>
 
-      {/* User Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {userStats.map((stat) => (
-          <Card
-            key={stat.title}
-            className="bg-gradient-surface border-admin-border shadow-md hover:shadow-lg transition-all duration-200"
-          >
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-admin-text-secondary">
-                    {stat.title}
-                  </p>
-                  <p className="text-2xl font-bold text-admin-text-primary">
-                    {stat.value}
-                  </p>
-                  <div className="flex items-center gap-1 mt-2">
-                    <span className="text-xs text-success">
-                      {stat.change}
-                    </span>
-                  </div>
-                </div>
-                <div className="p-3 rounded-lg bg-primary/10 text-primary">
-                  <stat.icon className="h-6 w-6" />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
+ 
 
       {/* Filters */}
       <Card className="bg-gradient-surface border-admin-border shadow-md">
@@ -241,8 +154,7 @@ export default function Users() {
                   <TableHead>Contact</TableHead>
                   <TableHead>Orders</TableHead>
                   <TableHead>Total Spent</TableHead>
-                  <TableHead>Rating</TableHead>
-                  <TableHead>Status</TableHead>
+              
                   <TableHead>Last Order</TableHead>
                   <TableHead>Actions</TableHead>
                 </TableRow>
@@ -262,9 +174,7 @@ export default function Users() {
                           <p className="font-medium text-admin-text-primary">
                             {user.name}
                           </p>
-                          <p className="text-sm text-admin-text-secondary">
-                            {user.id}
-                          </p>
+                         
                           <p className="text-xs text-admin-text-secondary">
                             Joined: {user.joinDate}
                           </p>
@@ -297,17 +207,8 @@ export default function Users() {
                     <TableCell className="font-semibold text-lg">
                       {user.totalSpent}
                     </TableCell>
-                    <TableCell>
-                      <div className="flex items-center gap-1">
-                        <Star className="h-4 w-4 text-warning fill-current" />
-                        <span className="font-medium">{user.rating}</span>
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <Badge variant={getStatusVariant(user.status)}>
-                        {user.status}
-                      </Badge>
-                    </TableCell>
+                  
+                   
                     <TableCell className="text-admin-text-secondary">
                       {user.lastOrder}
                     </TableCell>

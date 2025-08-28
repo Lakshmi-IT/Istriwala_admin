@@ -4,7 +4,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AdminLayout } from "./components/AdminLayout";
-import Index from "./pages/Index";
+
 import NotFound from "./pages/NotFound";
 import Dashboard from "./pages/admin/Dashboard";
 import Orders from "./pages/admin/Orders";
@@ -21,12 +21,12 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <Routes>
-          <Route path="/" element={<Index />} />
-          <Route path="/admin" element={<AdminLayout><Dashboard /></AdminLayout>} />
-          <Route path="/admin/orders" element={<AdminLayout><Orders /></AdminLayout>} />
-          <Route path="/admin/payments" element={<AdminLayout><Payments /></AdminLayout>} />
-          <Route path="/admin/users" element={<AdminLayout><Users /></AdminLayout>} />
-          <Route path="/admin/profile" element={<AdminLayout><Profile /></AdminLayout>} />
+          {/* <Route path="/" element={<Index />} /> */}
+          <Route path="/" element={<AdminLayout><Dashboard /></AdminLayout>} />
+          <Route path="/orders" element={<AdminLayout><Orders /></AdminLayout>} />
+          <Route path="/payments" element={<AdminLayout><Payments /></AdminLayout>} />
+          <Route path="/users" element={<AdminLayout><Users /></AdminLayout>} />
+          <Route path="/profile" element={<AdminLayout><Profile /></AdminLayout>} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

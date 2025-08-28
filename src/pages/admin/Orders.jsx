@@ -1,7 +1,8 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import axios from "axios";
 import { Badge } from "@/components/ui/badge";
 import {
   Table,
@@ -32,64 +33,66 @@ import {
 export default function Orders() {
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
+  const [allOrder, setAllOrders] = useState([])
 
-  const orders = [
-    {
-      id: "ORD-001",
-      customer: "Rajesh Kumar",
-      phone: "+91 98765 43210",
-      service: "Shirt Ironing",
-      items: 5,
-      amount: "₹150",
-      status: "completed",
-      date: "2024-01-15",
-      address: "123 Main Street, Delhi",
-    },
-    {
-      id: "ORD-002",
-      customer: "Priya Sharma",
-      phone: "+91 87654 32109",
-      service: "Full Wardrobe Service",
-      items: 15,
-      amount: "₹450",
-      status: "in-progress",
-      date: "2024-01-14",
-      address: "456 Park Avenue, Mumbai",
-    },
-    {
-      id: "ORD-003",
-      customer: "Amit Singh",
-      phone: "+91 76543 21098",
-      service: "Suit Pressing",
-      items: 2,
-      amount: "₹200",
-      status: "pending",
-      date: "2024-01-13",
-      address: "789 Garden Road, Bangalore",
-    },
-    {
-      id: "ORD-004",
-      customer: "Sunita Devi",
-      phone: "+91 65432 10987",
-      service: "Saree Ironing",
-      items: 3,
-      amount: "₹180",
-      status: "completed",
-      date: "2024-01-12",
-      address: "321 Temple Street, Chennai",
-    },
-    {
-      id: "ORD-005",
-      customer: "Mohammad Ali",
-      phone: "+91 54321 09876",
-      service: "Kurta Pressing",
-      items: 4,
-      amount: "₹120",
-      status: "cancelled",
-      date: "2024-01-11",
-      address: "654 Market Road, Hyderabad",
-    },
-  ];
+  // const orders = [
+  //   {
+  //     id: "ORD-001",
+  //     customer: "Rajesh Kumar",
+  //     phone: "+91 98765 43210",
+  //     service: "Shirt Ironing",
+  //     items: 5,
+  //     amount: "₹150",
+  //     status: "completed",
+  //     date: "2024-01-15",
+  //     address: "123 Main Street, Delhi",
+  //   },
+  //   {
+  //     id: "ORD-002",
+  //     customer: "Priya Sharma",
+  //     phone: "+91 87654 32109",
+  //     service: "Full Wardrobe Service",
+  //     items: 15,
+  //     amount: "₹450",
+  //     status: "in-progress",
+  //     date: "2024-01-14",
+  //     address: "456 Park Avenue, Mumbai",
+  //   },
+  //   {
+  //     id: "ORD-003",
+  //     customer: "Amit Singh",
+  //     phone: "+91 76543 21098",
+  //     service: "Suit Pressing",
+  //     items: 2,
+  //     amount: "₹200",
+  //     status: "pending",
+  //     date: "2024-01-13",
+  //     address: "789 Garden Road, Bangalore",
+  //   },
+  //   {
+  //     id: "ORD-004",
+  //     customer: "Sunita Devi",
+  //     phone: "+91 65432 10987",
+  //     service: "Saree Ironing",
+  //     items: 3,
+  //     amount: "₹180",
+  //     status: "completed",
+  //     date: "2024-01-12",
+  //     address: "321 Temple Street, Chennai",
+  //   },
+  //   {
+  //     id: "ORD-005",
+  //     customer: "Mohammad Ali",
+  //     phone: "+91 54321 09876",
+  //     service: "Kurta Pressing",
+  //     items: 4,
+  //     amount: "₹120",
+  //     status: "cancelled",
+  //     date: "2024-01-11",
+  //     address: "654 Market Road, Hyderabad",
+  //   },
+  // ];
+
 
   const getStatusIcon = (status) => {
     switch (status) {
@@ -121,19 +124,44 @@ export default function Orders() {
     }
   };
 
-  const filteredOrders = orders.filter((order) => {
-    const matchesSearch = 
+  const filteredOrders = allOrder.filter((order) => {
+    const matchesSearch =
       order.customer.toLowerCase().includes(searchTerm.toLowerCase()) ||
       order.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
       order.service.toLowerCase().includes(searchTerm.toLowerCase());
-    
+
     const matchesStatus = statusFilter === "all" || order.status === statusFilter;
-    
+
     return matchesSearch && matchesStatus;
   });
 
+
+  useEffect(() => {
+    // const token = localStorage.getItem("token");
+    // if (!token) return;
+
+    const fetchOrders = async () => {
+      try {
+        const res = await axios.get("http://localhost:5000/api/orders/getAllOrders", {
+          // headers: { Authorization: `Bearer ${token}` },
+        });
+
+
+
+        if (res.data.success) {
+          setAllOrders(res.data.orders);
+        }
+      } catch (err) {
+        console.error("Failed to load orders:", err);
+      }
+    };
+
+    fetchOrders();
+  }, []);
+  console.log(allOrder, "all orders")
+
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 lg:mb-0 mb-10">
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold text-admin-text-primary">Orders</h1>
@@ -141,10 +169,7 @@ export default function Orders() {
             Manage all your ironing service orders
           </p>
         </div>
-        <Button className="bg-gradient-primary border-0 shadow-glow">
-          <Package className="h-4 w-4 mr-2" />
-          New Order
-        </Button>
+
       </div>
 
       {/* Filters */}
@@ -203,7 +228,7 @@ export default function Orders() {
               </TableHeader>
               <TableBody>
                 {filteredOrders.map((order) => (
-                  <TableRow key={order.id} className="hover:bg-muted/50">
+                  <TableRow key={order?.id} className="hover:bg-muted/50">
                     <TableCell className="font-medium">{order.id}</TableCell>
                     <TableCell>
                       <div>
