@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react";
 import { NavLink } from "react-router-dom";
 import {
   LayoutDashboard,
@@ -5,7 +6,6 @@ import {
   CreditCard,
   Users,
   Settings,
-  TrendingUp,
 } from "lucide-react";
 import {
   Sidebar,
@@ -19,47 +19,64 @@ import {
   useSidebar,
 } from "./ui/sidebar";
 
-const menuItems = [
-  {
-    title: "Dashboard",
-    url: "/",
-    icon: LayoutDashboard,
-  },
-  {
-    title: "Orders",
-    url: "/orders",
-    icon: Package,
-  },
-  {
-    title: "Payments",
-    url: "/payments",
-    icon: CreditCard,
-  },
-  {
-    title: "Users",
-    url: "/users",
-    icon: Users,
-  },
-  {
-    title: "Profile Settings",
-    url: "/profile",
-    icon: Settings,
-  },
-];
-
 export function AdminSidebar() {
   const { state } = useSidebar();
+
+
   const collapsed = state === "collapsed";
+const [role, setRole] = useState("");
+  useEffect(() => {
+    const storedRole = localStorage.getItem("role");
+    setRole(storedRole || "admin");
+  }, []);
+
+  // base menu items
+  let menuItems = [
+    {
+      title: "Dashboard",
+      url: "/dashboard",
+      icon: LayoutDashboard,
+    },
+    {
+      title: "Orders",
+      url: "/orders",
+      icon: Package,
+    },
+    {
+      title: "Profile Settings",
+      url: "/profile",
+      icon: Settings,
+    },
+  ];
+
+  // add extra items only if NOT employee
+  if (role !== "employee") {
+    menuItems = [
+      ...menuItems,
+      {
+        title: "Payments",
+        url: "/payments",
+        icon: CreditCard,
+      },
+      {
+        title: "Users",
+        url: "/users",
+        icon: Users,
+      },
+      {
+        title: "Employees",
+        url: "/employees",
+        icon: Users,
+      },
+    ];
+  }
 
   return (
     <Sidebar className="border-r border-admin-border bg-admin-surface">
       <SidebarContent>
         <div className="p-6 border-b border-admin-border">
           <div className="flex items-center gap-3">
-            {/* <div className="h-8 w-8 rounded-lg bg-gradient-primary flex items-center justify-center"> */}
-              {/* <Package className="h-4 w-4 text-white" /> */}
-              <img src="/logo.png" alt="logo" className="h-10 w-10"/>
-            {/* </div> */}
+            <img src="/logo.png" alt="logo" className="h-10 w-10" />
             {!collapsed && (
               <div>
                 <h2 className="font-semibold text-admin-text-primary">
@@ -70,7 +87,7 @@ export function AdminSidebar() {
             )}
           </div>
         </div>
-        
+
         <SidebarGroup>
           <SidebarGroupLabel>Navigation</SidebarGroupLabel>
           <SidebarGroupContent>

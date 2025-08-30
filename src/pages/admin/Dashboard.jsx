@@ -12,11 +12,17 @@ import {
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import axios from "axios";
+import { BASE_URL } from "../../utils/url";
 
 export default function Dashboard() {
 
   const [ordersData, setordersData] = useState([])
-  const [allUsers,setAllUsers]=useState([])
+  const [allUsers, setAllUsers] = useState([])
+  const [role, setRole] = useState("");
+  useEffect(() => {
+    const storedRole = localStorage.getItem("role");
+    setRole(storedRole);
+  }, []);
 
 
   const totalRevenue = ordersData.reduce((sum, item) => {
@@ -25,33 +31,34 @@ export default function Dashboard() {
 
 
   const stats = [
-    {
-      title: "Total Orders",
-      value: ordersData?.length,
-      // change: "+12.5%",
-      trend: "up",
-      icon: Package,
-      color: "text-primary",
-    },
-    {
-      title: "Revenue",
-      value: totalRevenue,
-      // change: "+8.3%",
-      // trend: "up",
-      icon: DollarSign,
-      color: "text-success",
-    },
-    {
-      title: "Active Users",
-      value: allUsers?.length,
-    
-      icon: Users,
-      color: "text-warning",
-    },
+  {
+    title: "Total Orders",
+    value: ordersData?.length,
+    trend: "up",
+    icon: Package,
+    color: "text-primary",
+  },
+  {
+    title: "Revenue",
+    value: totalRevenue,
+    icon: DollarSign,
+    color: "text-success",
+  },
+  // Only include Active Users for non-employees
+  ...(role !== "employee"
+    ? [
+        {
+          title: "Active Users",
+          value: allUsers?.length,
+          icon: Users,
+          color: "text-warning",
+        },
+      ]
+    : []),
+];
 
-  ];
 
- 
+
 
   useEffect(() => {
     // const token = localStorage.getItem("token");
@@ -59,7 +66,7 @@ export default function Dashboard() {
 
     const fetchUsers = async () => {
       try {
-        const res = await axios.get("http://localhost:5000/api/user/getAllUsersWithOrders", {
+        const res = await axios.get(`${BASE_URL}api/user/getAllUsersWithOrders`, {
           // headers: { Authorization: `Bearer ${token}` },
         });
 
@@ -74,21 +81,24 @@ export default function Dashboard() {
     fetchUsers();
   }, []);
 
+
   useEffect(() => {
-    // const token = localStorage.getItem("token");
-    // if (!token) return;
+    const token = localStorage.getItem("token");
+    if (!token && role === "employee") return;
 
     const fetchOrders = async () => {
       try {
-        const res = await axios.get("http://localhost:5000/api/orders/getAllOrders", {
-          // headers: { Authorization: `Bearer ${token}` },
+        const url =
+          role === "employee"
+            ? `${BASE_URL}api/orders/employee/orders`
+            : `${BASE_URL}api/orders/getAllOrders`;
+
+        const res = await axios.get(url, {
+          headers: role === "employee" ? { Authorization: `Bearer ${token}` } : {},
         });
 
-        const data = res.data.orders;
-        console.log(data, "data")
-
         if (res.data.success) {
-          const payments = data.map((order) => ({
+          const payments = res.data.orders.map((order) => ({
             id: order?.id || "ORD-000",
             customer: order?.customer || "N/A",
             amount: order?.amount || "₹0",
@@ -96,22 +106,22 @@ export default function Dashboard() {
             status: order?.status || "pending",
             date: order?.date || "N/A",
             service: order?.service || "N/A",
-            // qty: order.qty.map(i => `${i.qty}`).join(", "),
-
             time: order?.date,
             transactionId: order?.paymentId || "N/A",
           }));
 
-          setordersData(payments); // set array, not single object
+          setordersData(payments);
         }
-
       } catch (err) {
         console.error("Failed to load orders:", err);
       }
     };
 
     fetchOrders();
-  }, []);
+  }, [role]);
+
+
+
 
 
   console.log(ordersData, "ordersData")
@@ -128,7 +138,7 @@ export default function Dashboard() {
             Welcome to your ISTRIWALA admin panel
           </p>
         </div>
-       
+
       </div>
 
       {/* Stats Grid */}

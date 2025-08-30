@@ -30,6 +30,7 @@ import {
   DollarSign,
 } from "lucide-react";
 import axios from "axios";
+import { BASE_URL } from "../../utils/url";
 
 export default function Payments() {
   const [searchTerm, setSearchTerm] = useState("");
@@ -144,7 +145,7 @@ export default function Payments() {
 
     const fetchOrders = async () => {
       try {
-        const res = await axios.get("http://localhost:5000/api/orders/getAllOrders", {
+        const res = await axios.get(`${BASE_URL}api/orders/getAllOrders`, {
           // headers: { Authorization: `Bearer ${token}` },
         });
 

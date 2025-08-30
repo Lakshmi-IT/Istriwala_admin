@@ -32,6 +32,7 @@ import {
   Star,
 } from "lucide-react";
 import axios from "axios";
+import { BASE_URL } from "../../utils/url";
 
 export default function Users() {
   const [searchTerm, setSearchTerm] = useState("");
@@ -72,7 +73,7 @@ export default function Users() {
 
     const fetchUsers = async () => {
       try {
-        const res = await axios.get("http://localhost:5000/api/user/getAllUsersWithOrders", {
+        const res = await axios.get(`${BASE_URL}api/user/getAllUsersWithOrders`, {
           // headers: { Authorization: `Bearer ${token}` },
         });
 
@@ -156,7 +157,7 @@ export default function Users() {
                   <TableHead>Total Spent</TableHead>
               
                   <TableHead>Last Order</TableHead>
-                  <TableHead>Actions</TableHead>
+                  {/* <TableHead>Actions</TableHead> */}
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -212,7 +213,7 @@ export default function Users() {
                     <TableCell className="text-admin-text-secondary">
                       {user.lastOrder}
                     </TableCell>
-                    <TableCell>
+                    {/* <TableCell>
                       <div className="flex items-center gap-2">
                         <Button variant="ghost" size="sm">
                           <Eye className="h-4 w-4" />
@@ -221,7 +222,7 @@ export default function Users() {
                           <Edit className="h-4 w-4" />
                         </Button>
                       </div>
-                    </TableCell>
+                    </TableCell> */}
                   </TableRow>
                 ))}
               </TableBody>
