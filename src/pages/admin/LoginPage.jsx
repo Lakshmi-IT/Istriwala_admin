@@ -5,11 +5,13 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import axios from "axios";
 import { toast } from "react-toastify";
 import { BASE_URL } from "../../utils/url";
+import { useNavigate } from "react-router-dom";
 
 export default function LoginPage() {
     const [role, setRole] = useState("admin");
     const [formData, setFormData] = useState({ email: "", password: "" });
     const [loading, setLoading] = useState(false);
+      const navigate = useNavigate();
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
@@ -39,9 +41,11 @@ export default function LoginPage() {
 
             // Redirect
             if (role === "admin") {
-                window.location.href = "/dashboard";
+                // window.location.href = "/dashboard";
+                navigate("/dashboard")
             } else {
-                window.location.href = "/dashboard";
+                // window.location.href = "/dashboard";
+                navigate("/dashboard")
             }
         } catch (err) {
             console.error("Login error:", err.response?.data || err.message);
