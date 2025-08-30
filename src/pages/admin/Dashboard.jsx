@@ -19,9 +19,12 @@ export default function Dashboard() {
   const [ordersData, setordersData] = useState([])
   const [allUsers, setAllUsers] = useState([])
   const [role, setRole] = useState("");
+  const [name, setName] = useState("")
   useEffect(() => {
     const storedRole = localStorage.getItem("role");
+    const storedname = localStorage.getItem("name");
     setRole(storedRole);
+    setName(storedname);
   }, []);
 
 
@@ -31,22 +34,22 @@ export default function Dashboard() {
 
 
   const stats = [
-  {
-    title: "Total Orders",
-    value: ordersData?.length,
-    trend: "up",
-    icon: Package,
-    color: "text-primary",
-  },
-  {
-    title: "Revenue",
-    value: totalRevenue,
-    icon: DollarSign,
-    color: "text-success",
-  },
-  // Only include Active Users for non-employees
-  ...(role !== "employee"
-    ? [
+    {
+      title: "Total Orders",
+      value: ordersData?.length,
+      trend: "up",
+      icon: Package,
+      color: "text-primary",
+    },
+    {
+      title: "Revenue",
+      value: totalRevenue,
+      icon: DollarSign,
+      color: "text-success",
+    },
+    // Only include Active Users for non-employees
+    ...(role !== "employee"
+      ? [
         {
           title: "Active Users",
           value: allUsers?.length,
@@ -54,8 +57,8 @@ export default function Dashboard() {
           color: "text-warning",
         },
       ]
-    : []),
-];
+      : []),
+  ];
 
 
 
@@ -124,6 +127,8 @@ export default function Dashboard() {
 
 
 
+
+
   console.log(ordersData, "ordersData")
 
 
@@ -131,9 +136,20 @@ export default function Dashboard() {
     <div className="space-y-6 lg:mb-0 mb-10">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-admin-text-primary">
-            Dashboard
-          </h1>
+
+          {role === "employee" ? (
+            <h1 className="text-3xl font-bold text-admin-text-primary">
+              Hello {name?.charAt(0)?.toUpperCase() + name?.slice(1)} {" "}
+              Welcome to Dashboard!
+            </h1>
+
+          ) : (
+            <h1 className="text-3xl font-bold text-admin-text-primary">
+              Welcome to Dashboard!
+            </h1>
+
+          )}
+
           <p className="text-admin-text-secondary">
             Welcome to your ISTRIWALA admin panel
           </p>

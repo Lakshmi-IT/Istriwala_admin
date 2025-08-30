@@ -71,7 +71,7 @@ export function AdminLayout({ children }) {
               <div className="flex items-center gap-4">
                 {/* Desktop Buttons */}
                 <div className="hidden md:flex gap-4">
-                  {role === "employee" ? null : (
+                  {role === "employee" ? "" : (
                     <Link to={"/addEmployee"}>
                       <button
                         className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-semibold transition"
@@ -103,13 +103,15 @@ export function AdminLayout({ children }) {
             {/* Mobile Dropdown Menu */}
             {menuOpen && (
               <div className="absolute top-16 right-6 bg-white shadow-lg rounded-lg p-4 flex flex-col gap-3 md:hidden z-50">
-                <Link to={"/addEmployee"}>
-                  <button
-                    className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-semibold transition"
-                  >
-                    <UserPlus className="h-5 w-5" /> Add Employee
-                  </button>
-                </Link>
+                {role !== "employee" && (
+                  <Link to={"/addEmployee"}>
+                    <button
+                      className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-semibold transition"
+                    >
+                      <UserPlus className="h-5 w-5" /> Add Employee
+                    </button>
+                  </Link>
+                )}
                 <button
                   onClick={handleLogout}
                   className="flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg font-semibold transition"
@@ -143,6 +145,9 @@ export function AdminLayout({ children }) {
             <span>Orders</span>
           </Link>
 
+
+         {role === "employee" ? null : (
+
           <Link
             to="/payments"
             className={`flex flex-col items-center text-sm ${isActive("/payments") ? "text-blue-600 font-semibold" : "text-admin-text-secondary"
@@ -151,6 +156,9 @@ export function AdminLayout({ children }) {
             <IndianRupee className={`h-5 w-5 ${isActive("/payments") ? "stroke-blue-600" : ""}`} />
             <span>Payments</span>
           </Link>
+          )}
+
+           {role === "employee" ? null : (
 
           <Link
             to="/users"
@@ -160,6 +168,7 @@ export function AdminLayout({ children }) {
             <Users className={`h-5 w-5 ${isActive("/users") ? "stroke-blue-600" : ""}`} />
             <span>Users</span>
           </Link>
+          )}
 
           <Link
             to="/profile"
