@@ -594,34 +594,65 @@ export default function Orders() {
                   //     )}
                   //   </div>
                   // </Modal>
-                  <Dialog open={isOpen} onOpenChange={setIsOpen}>
-                    <DialogContent className="sm:max-w-[700px]">
-                      <DialogHeader>
-                        <DialogTitle>Route Preview</DialogTitle>
-                      </DialogHeader>
+                  // <Dialog open={isOpen} onOpenChange={setIsOpen}>
+                  //   <DialogContent className="sm:max-w-[700px]">
+                  //     <DialogHeader>
+                  //       <DialogTitle>Route Preview</DialogTitle>
+                  //     </DialogHeader>
 
-                      <div className="h-[500px] w-full">
-                        {isLoaded && currentLocation && (
-                          <GoogleMap
-                            center={currentLocation}
-                            zoom={14}
-                            mapContainerStyle={{ width: "100%", height: "100%" }}
-                          >
-                            {directions && <DirectionsRenderer directions={directions} />}
-                          </GoogleMap>
-                        )}
-                      </div>
+                  //     <div className="h-[500px] w-full">
+                  //       {isLoaded && currentLocation && (
+                  //         <GoogleMap
+                  //           center={currentLocation}
+                  //           zoom={14}
+                  //           mapContainerStyle={{ width: "100%", height: "100%" }}
+                  //         >
+                  //           {directions && <DirectionsRenderer directions={directions} />}
+                  //         </GoogleMap>
+                  //       )}
+                  //     </div>
 
-                      <DialogFooter>
-                        <button
-                          onClick={() => setIsOpen(false)}
-                          className="px-4 py-2 rounded bg-primary text-white"
-                        >
-                          Close
-                        </button>
-                      </DialogFooter>
-                    </DialogContent>
-                  </Dialog>
+                  //     <DialogFooter>
+                  //       <button
+                  //         onClick={() => setIsOpen(false)}
+                  //         className="px-4 py-2 rounded bg-primary text-white"
+                  //       >
+                  //         Close
+                  //       </button>
+                  //     </DialogFooter>
+                  //   </DialogContent>
+                  // </Dialog>
+              <Dialog open={isOpen} onOpenChange={setIsOpen}>
+  <DialogContent 
+    className="sm:max-w-[700px] h-[90vh] w-[95%] rounded-lg overflow-hidden z-[9999]"
+  >
+    <DialogHeader>
+      <DialogTitle>Route Preview</DialogTitle>
+    </DialogHeader>
+
+    <div className="h-[70vh] w-full">
+      {isLoaded && currentLocation && (
+        <GoogleMap
+          center={currentLocation}
+          zoom={14}
+          mapContainerStyle={{ width: "100%", height: "100%" }}
+        >
+          {directions && <DirectionsRenderer directions={directions} />}
+        </GoogleMap>
+      )}
+    </div>
+
+    <DialogFooter>
+      <button
+        onClick={() => setIsOpen(false)}
+        className="px-4 py-2 rounded bg-primary text-white"
+      >
+        Close
+      </button>
+    </DialogFooter>
+  </DialogContent>
+</Dialog>
+
                 )}
               </div>
 
