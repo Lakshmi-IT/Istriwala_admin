@@ -354,6 +354,8 @@ export default function Orders() {
 
 
 
+  console.log(selectedOrder,"selectedOrder")
+
 
 
   return (
@@ -622,36 +624,36 @@ export default function Orders() {
                   //     </DialogFooter>
                   //   </DialogContent>
                   // </Dialog>
-              <Dialog open={isOpen} onOpenChange={setIsOpen}>
-  <DialogContent 
-    className="sm:max-w-[700px] h-[90vh] w-[95%] rounded-lg overflow-hidden z-[9999]"
-  >
-    <DialogHeader>
-      <DialogTitle>Route Preview</DialogTitle>
-    </DialogHeader>
+                  <Dialog open={isOpen} onOpenChange={setIsOpen}>
+                    <DialogContent
+                      className="sm:max-w-[700px] h-[90vh] w-[95%] rounded-lg overflow-hidden z-[9999]"
+                    >
+                      <DialogHeader>
+                        <DialogTitle>Route Preview</DialogTitle>
+                      </DialogHeader>
 
-    <div className="h-[70vh] w-full">
-      {isLoaded && currentLocation && (
-        <GoogleMap
-          center={currentLocation}
-          zoom={14}
-          mapContainerStyle={{ width: "100%", height: "100%" }}
-        >
-          {directions && <DirectionsRenderer directions={directions} />}
-        </GoogleMap>
-      )}
-    </div>
+                      <div className="h-[70vh] w-full">
+                        {isLoaded && currentLocation && (
+                          <GoogleMap
+                            center={currentLocation}
+                            zoom={14}
+                            mapContainerStyle={{ width: "100%", height: "100%" }}
+                          >
+                            {directions && <DirectionsRenderer directions={directions} />}
+                          </GoogleMap>
+                        )}
+                      </div>
 
-    <DialogFooter>
-      <button
-        onClick={() => setIsOpen(false)}
-        className="px-4 py-2 rounded bg-primary text-white"
-      >
-        Close
-      </button>
-    </DialogFooter>
-  </DialogContent>
-</Dialog>
+                      <DialogFooter>
+                        <button
+                          onClick={() => setIsOpen(false)}
+                          className="px-4 py-2 rounded bg-primary text-white"
+                        >
+                          Close
+                        </button>
+                      </DialogFooter>
+                    </DialogContent>
+                  </Dialog>
 
                 )}
               </div>
@@ -671,10 +673,16 @@ export default function Orders() {
                           <div className="flex flex-col gap-1">
                             <p className="text-gray-500 text-xs mb-1">Pickup Photo:</p>
                             <img
-                              src={selectedOrder.pickupImage}
+                              src={selectedOrder?.pickupImage ? `http://localhost:5000${selectedOrder.pickupImage}` : ""}
                               alt="Pickup"
                               className="w-48 h-32 object-cover rounded-md border"
                             />
+
+                           { console.log("Pickup Image:", selectedOrder?.pickupImage)}
+
+
+
+
                             <p>
                               PickedUp at:{" "}
                               {selectedOrder?.pickupAt
@@ -697,8 +705,13 @@ export default function Orders() {
                           <div className="flex flex-col gap-1">
                             <p className="text-gray-500 text-xs mb-1">Delivery Photo:</p>
                             <img
-                              src={selectedOrder.deliveryImage}
+                              src={selectedOrder?.deliveryImages}
                               alt="Delivery"
+                              className="w-48 h-32 object-cover rounded-md border"
+                            />
+                             <img
+                              src={selectedOrder?.deliveryImages ? `${BASE_URL}${selectedOrder?.deliveryImages}` : ""}
+                              alt="Pickup"
                               className="w-48 h-32 object-cover rounded-md border"
                             />
 
@@ -725,10 +738,10 @@ export default function Orders() {
                           <button type="button" className="bg-green-500 text-white rounded-lg w-[100px]">Done</button>
                           <p className="text-gray-500 text-xs mb-1">Pickup Photo:</p>
                           <img
-                            src={selectedOrder.pickupImage}
-                            alt="Pickup"
-                            className="w-48 h-32 object-cover rounded-md border"
-                          />
+                              src={selectedOrder?.pickupImage ? `${BASE_URL}${selectedOrder.pickupImage}` : ""}
+                              alt="Pickup"
+                              className="w-48 h-32 object-cover rounded-md border"
+                            />
                         </div>
 
                         {/* Upload Delivery Photo */}
@@ -829,24 +842,24 @@ export default function Orders() {
                             : ""}
                         </p>
 
-                       
+
 
                       </div>
-                       <div className="bg-gray-50 p-2 sm:p-3 rounded-lg">
-                          <p className="font-medium">
-                                Delivered at: {" "}
-                                {selectedOrder?.deliveredAt
-                                  ? new Date(selectedOrder.deliveredAt).toLocaleString("en-IN", {
-                                    day: "2-digit",
-                                    month: "2-digit",
-                                    year: "numeric",
-                                    hour: "2-digit",
-                                    minute: "2-digit",
-                                    hour12: true,
-                                  })
-                                  : "Not Delivered at"}
-                              </p>
-                       </div>
+                      <div className="bg-gray-50 p-2 sm:p-3 rounded-lg">
+                        <p className="font-medium">
+                          Delivered at: {" "}
+                          {selectedOrder?.deliveredAt
+                            ? new Date(selectedOrder.deliveredAt).toLocaleString("en-IN", {
+                              day: "2-digit",
+                              month: "2-digit",
+                              year: "numeric",
+                              hour: "2-digit",
+                              minute: "2-digit",
+                              hour12: true,
+                            })
+                            : "Not Delivered at"}
+                        </p>
+                      </div>
                     </div>
                     <div className="flex flex-col lg:flex-col gap-3">
                       {selectedOrder?.status === "DELIVERED" ? (
@@ -876,7 +889,7 @@ export default function Orders() {
                                 className="w-48 h-32 object-cover rounded-md border"
                               />
 
-                             
+
                             </div>
                           )}
                         </div>
