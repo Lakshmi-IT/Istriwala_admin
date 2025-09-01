@@ -9,6 +9,7 @@ import {
   ArrowDownRight,
   ShoppingCart,
   CheckCircle,
+  IndianRupee,
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import axios from "axios";
@@ -44,7 +45,7 @@ export default function Dashboard() {
     {
       title: "Revenue",
       value: totalRevenue,
-      icon: DollarSign,
+      icon: IndianRupee,
       color: "text-success",
     },
     // Only include Active Users for non-employees
