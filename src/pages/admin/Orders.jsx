@@ -71,6 +71,10 @@ export default function Orders() {
   const [currentLocation, setCurrentLocation] = useState(null);
 
 
+  const [pickupCode, setPickupCode] = useState("");
+  const [deliveryCode, setDeliveryCode] = useState("");
+  const [verifying, setVerifying] = useState(false);
+
 
   useEffect(() => {
     const storedRole = localStorage.getItem("role");
@@ -352,9 +356,48 @@ export default function Orders() {
   };
 
 
+  // Add these states at top
 
 
-  console.log(selectedOrder,"selectedOrder")
+  // Verification handler
+  const handleVerifyCode = async (type, orderId) => {
+    if (!orderId) return;
+    setVerifying(true);
+    try {
+      const token = localStorage.getItem("token");
+      const res = await axios.put(
+        `${BASE_URL}api/orders/employee/verifyCode`,
+        {
+          orderId,
+          type, // "PICKUP" or "DELIVERY"
+          code: type === "PICKUP" ? pickupCode : deliveryCode,
+        },
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+
+      if (res.data.success) {
+        toast.success(`✅ ${type} verified successfully!`);
+        setViewOpen(false);
+        setPickupCode("");
+        setDeliveryCode("");
+      } else {
+        toast.error(res.data.message || "❌ Invalid code");
+      }
+    } catch (err) {
+      toast.error("Verification failed");
+      console.error("Verification error:", err);
+    } finally {
+      setVerifying(false);
+    }
+  };
+
+
+
+
+
+  console.log(selectedOrder, "selectedOrder")
 
 
 
@@ -668,139 +711,101 @@ export default function Orders() {
                   <div className="flex flex-col lg:flex-col gap-3">
                     {selectedOrder?.status === "DELIVERED" ? (
                       <div className="grid lg:grid-cols-2 grid-col-1">
-                        {/* Show Pickup Image */}
-                        {selectedOrder.pickupImage && (
-                          <div className="flex flex-col gap-1">
-                            <p className="text-gray-500 text-xs mb-1">Pickup Photo:</p>
-                            <img
-                              src={selectedOrder?.pickupImage ? `http://localhost:5000${selectedOrder.pickupImage}` : ""}
-                              alt="Pickup"
-                              className="w-48 h-32 object-cover rounded-md border"
-                            />
-
-                           { console.log("Pickup Image:", selectedOrder?.pickupImage)}
-
-
-
-
-                            <p>
-                              PickedUp at:{" "}
-                              {selectedOrder?.pickupAt
-                                ? new Date(selectedOrder.pickupAt).toLocaleString("en-IN", {
-                                  day: "2-digit",
-                                  month: "2-digit",
-                                  year: "numeric",
-                                  hour: "2-digit",
-                                  minute: "2-digit",
-                                  hour12: true,
-                                })
-                                : ""}
-                            </p>
-
-                          </div>
-                        )}
-
-                        {/* Show Delivery Image */}
-                        {selectedOrder.deliveryImage && (
-                          <div className="flex flex-col gap-1">
-                            <p className="text-gray-500 text-xs mb-1">Delivery Photo:</p>
-                            <img
-                              src={selectedOrder?.deliveryImages}
-                              alt="Delivery"
-                              className="w-48 h-32 object-cover rounded-md border"
-                            />
-                             <img
-                              src={selectedOrder?.deliveryImages ? `${BASE_URL}${selectedOrder?.deliveryImages}` : ""}
-                              alt="Pickup"
-                              className="w-48 h-32 object-cover rounded-md border"
-                            />
-
-                            <p>
-                              Delivered at: {" "}
-                              {selectedOrder?.deliveredAt
-                                ? new Date(selectedOrder.deliveredAt).toLocaleString("en-IN", {
-                                  day: "2-digit",
-                                  month: "2-digit",
-                                  year: "numeric",
-                                  hour: "2-digit",
-                                  minute: "2-digit",
-                                  hour12: true,
-                                })
-                                : "Not Delivered at"}
-                            </p>
-                          </div>
-                        )}
-                      </div>
-                    ) : selectedOrder?.status === "PICKED_UP" && selectedOrder?.pickupImage ? (
-                      <>
-                        {/* Show Pickup Image */}
+                        {/* Show Pickup Info */}
                         <div className="flex flex-col gap-1">
-                          <button type="button" className="bg-green-500 text-white rounded-lg w-[100px]">Done</button>
-                          <p className="text-gray-500 text-xs mb-1">Pickup Photo:</p>
-                          <img
-                              src={selectedOrder?.pickupImage ? `${BASE_URL}${selectedOrder.pickupImage}` : ""}
-                              alt="Pickup"
-                              className="w-48 h-32 object-cover rounded-md border"
-                            />
+                          <p className="text-gray-500 text-xs mb-1">Pickup Code:</p>
+                          <p className="font-semibold">{selectedOrder?.pickupId}</p>
+                          <p>
+                            PickedUp at:{" "}
+                            {selectedOrder?.pickedAt
+                              ? new Date(selectedOrder.pickedAt).toLocaleString("en-IN", {
+                                day: "2-digit",
+                                month: "2-digit",
+                                year: "numeric",
+                                hour: "2-digit",
+                                minute: "2-digit",
+                                hour12: true,
+                              })
+                              : ""}
+                          </p>
                         </div>
 
-                        {/* Upload Delivery Photo */}
+                        {/* Show Delivery Info */}
+                        <div className="flex flex-col gap-1">
+                          <p className="text-gray-500 text-xs mb-1">Delivery Code:</p>
+                          <p className="font-semibold">{selectedOrder?.deliveryId}</p>
+                          <p>
+                            Delivered at:{" "}
+                            {selectedOrder?.deliveredAt
+                              ? new Date(selectedOrder.deliveredAt).toLocaleString("en-IN", {
+                                day: "2-digit",
+                                month: "2-digit",
+                                year: "numeric",
+                                hour: "2-digit",
+                                minute: "2-digit",
+                                hour12: true,
+                              })
+                              : "Not Delivered"}
+                          </p>
+                        </div>
+                      </div>
+                    ) : selectedOrder?.status === "PICKED_UP" ? (
+                      <>
+                        {/* Pickup Done */}
+                        <div className="flex flex-col gap-1">
+                          <button type="button" className="bg-green-500 text-white rounded-lg w-[100px]">
+                            Done
+                          </button>
+                          <p className="text-gray-500 text-xs mb-1">Pickup Code Verified ✅</p>
+                        </div>
+
+                        {/* Enter Delivery Code */}
                         <div className="flex flex-col gap-2">
-                          <p className="font-medium text-sm">Upload Delivery Photo</p>
+                          <p className="font-medium text-sm">Enter Delivery Code</p>
                           <input
-                            type="file"
-                            accept="image/*"
-                            className="p-2 border rounded-md"
-                            onChange={handleFileChange}
+                            type="text"
+                            maxLength={6}
+                            pattern="\d{6}"
+                            className="p-2 border rounded-md w-[150px]"
+                            placeholder="Enter 6-digit code"
+                            value={deliveryCode}
+                            onChange={(e) => setDeliveryCode(e.target.value.replace(/\D/g, ""))}
                           />
-                          {previewUrl && (
-                            <div>
-                              <p className="text-gray-500 text-xs mb-1">Preview:</p>
-                              <img
-                                src={previewUrl}
-                                alt="Preview"
-                                className="w-48 h-32 object-cover rounded-md border"
-                              />
-                            </div>
-                          )}
                           <button
-                            onClick={() => handleDiliveryupUpload(selectedOrder?._id)}
-                            disabled={!selectedFile || uploading}
-                            className={`px-4 py-2 rounded-md text-white ${uploading ? "bg-gray-400" : "bg-primary"}`}
+                            onClick={() => handleVerifyCode("DELIVERY", selectedOrder?._id)}
+                            disabled={deliveryCode.length !== 6 || verifying}
+                            className={`px-4 py-2 rounded-md text-white ${verifying ? "bg-gray-400" : "bg-primary"
+                              }`}
                           >
-                            {uploading ? "Uploading..." : "Upload"}
+                            {verifying ? "Verifying..." : "Submit"}
                           </button>
                         </div>
                       </>
                     ) : (
-                      // Show Pickup Upload if order not picked up yet
+                      // Enter Pickup Code
                       <div className="flex flex-col gap-3">
+                        <p className="font-medium text-sm">Enter Pickup Code</p>
                         <input
-                          type="file"
-                          accept="image/*"
-                          className="p-2 border rounded-md"
-                          onChange={handleFileChange}
+                          type="text"
+                          maxLength={6}
+                          pattern="\d{6}"
+                          className="p-2 border rounded-md w-[150px]"
+                          placeholder="Enter 6-digit code"
+                          value={pickupCode}
+                          onChange={(e) => setPickupCode(e.target.value.replace(/\D/g, ""))}
                         />
-                        {previewUrl && (
-                          <div>
-                            <p className="text-gray-500 text-xs mb-1">Preview:</p>
-                            <img
-                              src={previewUrl}
-                              alt="Preview"
-                              className="w-48 h-32 object-cover rounded-md border"
-                            />
-                          </div>
-                        )}
                         <button
-                          onClick={() => handlePickupUpload(selectedOrder?._id)}
-                          disabled={!selectedFile || uploading}
-                          className={`px-4 py-2 rounded-md text-white ${uploading ? "bg-gray-400" : "bg-primary"}`}
+                          onClick={() => handleVerifyCode("PICKUP", selectedOrder?._id)}
+                          disabled={pickupCode.length !== 6 || verifying}
+                          className={`px-4 py-2 rounded-md text-white ${verifying ? "bg-gray-400" : "bg-primary"
+                            }`}
                         >
-                          {uploading ? "Uploading..." : "Upload"}
+                          {verifying ? "Verifying..." : "Submit"}
                         </button>
                       </div>
                     )}
                   </div>
+
 
 
                 ) : selectedOrder.employee ? (
@@ -864,101 +869,96 @@ export default function Orders() {
                     <div className="flex flex-col lg:flex-col gap-3">
                       {selectedOrder?.status === "DELIVERED" ? (
                         <div className="grid lg:grid-cols-2 grid-col-1">
-                          {/* Show Pickup Image */}
-                          {selectedOrder.pickupImage && (
-                            <div className="flex flex-col gap-1">
-                              <p className="text-gray-500 text-xs mb-1">Pickup Photo:</p>
-
-                              <img
-                                src={selectedOrder.pickupImage}
-                                alt="Pickup"
-                                className="w-48 h-32 object-cover rounded-md border"
-                              />
-
-
-                            </div>
-                          )}
-
-                          {/* Show Delivery Image */}
-                          {selectedOrder.deliveryImage && (
-                            <div className="flex flex-col gap-1">
-                              <p className="text-gray-500 text-xs mb-1">Delivery Photo:</p>
-                              <img
-                                src={selectedOrder.deliveryImage}
-                                alt="Delivery"
-                                className="w-48 h-32 object-cover rounded-md border"
-                              />
-
-
-                            </div>
-                          )}
-                        </div>
-                      ) : selectedOrder?.status === "PICKED_UP" && selectedOrder?.pickupImage ? (
-                        <>
-                          {/* Show Pickup Image */}
+                          {/* Show Pickup Info */}
                           <div className="flex flex-col gap-1">
-                            <button type="button" className="bg-green-500 text-white rounded-lg w-[100px]">Done</button>
-                            <p className="text-gray-500 text-xs mb-1">Pickup Photo:</p>
-                            <img
-                              src={selectedOrder.pickupImage}
-                              alt="Pickup"
-                              className="w-48 h-32 object-cover rounded-md border"
-                            />
+                            <p className="text-gray-500 text-xs mb-1">Pickup Code:</p>
+                            <p className="font-semibold">{selectedOrder?.pickupId}</p>
+                            <p>
+                              PickedUp at:{" "}
+                              {selectedOrder?.pickedAt
+                                ? new Date(selectedOrder.pickedAt).toLocaleString("en-IN", {
+                                  day: "2-digit",
+                                  month: "2-digit",
+                                  year: "numeric",
+                                  hour: "2-digit",
+                                  minute: "2-digit",
+                                  hour12: true,
+                                })
+                                : ""}
+                            </p>
                           </div>
 
-                          {/* Upload Delivery Photo */}
+                          {/* Show Delivery Info */}
+                          <div className="flex flex-col gap-1">
+                            <p className="text-gray-500 text-xs mb-1">Delivery Code:</p>
+                            <p className="font-semibold">{selectedOrder?.deliveryId}</p>
+                            <p>
+                              Delivered at:{" "}
+                              {selectedOrder?.deliveredAt
+                                ? new Date(selectedOrder.deliveredAt).toLocaleString("en-IN", {
+                                  day: "2-digit",
+                                  month: "2-digit",
+                                  year: "numeric",
+                                  hour: "2-digit",
+                                  minute: "2-digit",
+                                  hour12: true,
+                                })
+                                : "Not Delivered"}
+                            </p>
+                          </div>
+                        </div>
+                      ) : selectedOrder?.status === "PICKED_UP" ? (
+                        <>
+                          {/* Pickup Done */}
+                          <div className="flex flex-col gap-1">
+                            <button type="button" className="bg-green-500 text-white rounded-lg w-[100px]">
+                              Done
+                            </button>
+                            <p className="text-gray-500 text-xs mb-1">Pickup Code Verified ✅</p>
+                          </div>
+
+                          {/* Enter Delivery Code */}
                           <div className="flex flex-col gap-2">
-                            <p className="font-medium text-sm">Upload Delivery Photo</p>
+                            <p className="font-medium text-sm">Enter Delivery Code</p>
                             <input
-                              type="file"
-                              accept="image/*"
-                              className="p-2 border rounded-md"
-                              onChange={handleFileChange}
+                              type="text"
+                              maxLength={6}
+                              pattern="\d{6}"
+                              className="p-2 border rounded-md w-[150px]"
+                              placeholder="Enter 6-digit code"
+                              value={deliveryCode}
+                              onChange={(e) => setDeliveryCode(e.target.value.replace(/\D/g, ""))}
                             />
-                            {previewUrl && (
-                              <div>
-                                <p className="text-gray-500 text-xs mb-1">Preview:</p>
-                                <img
-                                  src={previewUrl}
-                                  alt="Preview"
-                                  className="w-48 h-32 object-cover rounded-md border"
-                                />
-                              </div>
-                            )}
                             <button
-                              onClick={() => handleDiliveryupUpload(selectedOrder?._id)}
-                              disabled={!selectedFile || uploading}
-                              className={`px-4 py-2 rounded-md text-white ${uploading ? "bg-gray-400" : "bg-primary"}`}
+                              onClick={() => handleVerifyCode("DELIVERY", selectedOrder?._id)}
+                              disabled={deliveryCode.length !== 6 || verifying}
+                              className={`px-4 py-2 rounded-md text-white ${verifying ? "bg-gray-400" : "bg-primary"
+                                }`}
                             >
-                              {uploading ? "Uploading..." : "Upload"}
+                              {verifying ? "Verifying..." : "Submit"}
                             </button>
                           </div>
                         </>
                       ) : (
-                        // Show Pickup Upload if order not picked up yet
+                        // Enter Pickup Code
                         <div className="flex flex-col gap-3">
+                          <p className="font-medium text-sm">Enter Pickup Code</p>
                           <input
-                            type="file"
-                            accept="image/*"
-                            className="p-2 border rounded-md"
-                            onChange={handleFileChange}
+                            type="text"
+                            maxLength={6}
+                            pattern="\d{6}"
+                            className="p-2 border rounded-md w-[150px]"
+                            placeholder="Enter 6-digit code"
+                            value={pickupCode}
+                            onChange={(e) => setPickupCode(e.target.value.replace(/\D/g, ""))}
                           />
-                          {previewUrl && (
-                            <div>
-                              <p className="text-gray-500 text-xs mb-1">Preview:</p>
-                              <img
-                                src={previewUrl}
-                                alt="Preview"
-                                className="w-48 h-32 object-cover rounded-md border"
-                              />
-                            </div>
-                          )}
                           <button
-                            onClick={() => handlePickupUpload(selectedOrder?._id)}
-                            disabled={!selectedFile || uploading}
-                            className={`px-4 py-2 rounded-md text-white ${uploading ? "bg-gray-400" : "bg-primary"}`}
+                            onClick={() => handleVerifyCode("PICKUP", selectedOrder?._id)}
+                            disabled={pickupCode.length !== 6 || verifying}
+                            className={`px-4 py-2 rounded-md text-white ${verifying ? "bg-gray-400" : "bg-primary"
+                              }`}
                           >
-                            {uploading ? "Uploading..." : "Upload"}
+                            {verifying ? "Verifying..." : "Submit"}
                           </button>
                         </div>
                       )}

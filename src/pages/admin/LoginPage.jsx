@@ -42,11 +42,11 @@ export default function LoginPage() {
 
             // Redirect
             if (role === "admin") {
-                // window.location.href = "/dashboard";
-                navigate("/dashboard")
+                window.location.href = "/dashboard";
+                // navigate("/dashboard")
             } else {
-                // window.location.href = "/dashboard";
-                navigate("/dashboard")
+                window.location.href = "/dashboard";
+                // navigate("/dashboard")
             }
         } catch (err) {
             console.error("Login error:", err.response?.data || err.message);
