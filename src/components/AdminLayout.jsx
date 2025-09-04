@@ -170,14 +170,14 @@ export function AdminLayout({ children }) {
           </Link>
           )}
 
-          <Link
+          {/* <Link
             to="/profile"
             className={`flex flex-col items-center text-sm ${isActive("/profile") ? "text-blue-600 font-semibold" : "text-admin-text-secondary"
               }`}
           >
             <Settings className={`h-5 w-5 ${isActive("/profile") ? "stroke-blue-600" : ""}`} />
             <span>Settings</span>
-          </Link>
+          </Link> */}
         </nav>
       </div>
     </SidebarProvider>

@@ -42,11 +42,11 @@ const [role, setRole] = useState("");
       url: "/orders",
       icon: Package,
     },
-    {
-      title: "Profile Settings",
-      url: "/profile",
-      icon: Settings,
-    },
+    // {
+    //   title: "Profile Settings",
+    //   url: "/profile",
+    //   icon: Settings,
+    // },
   ];
 
   // add extra items only if NOT employee
