@@ -29,9 +29,18 @@ export default function Dashboard() {
   }, []);
 
 
+  // const totalRevenue = ordersData.reduce((sum, item) => {
+  //   return sum + Number(item.amount?.toString().replace(/[₹,]/g, "") || 0);
+  // }, 0);
+
+  console.log(ordersData, "ordersData")
   const totalRevenue = ordersData.reduce((sum, item) => {
-    return sum + Number(item.amount?.toString().replace(/[₹,]/g, "") || 0);
+    if (item.status === "DELIVERED") {
+      return sum + Number(item.amount?.toString().replace(/[₹,]/g, "") || 0);
+    }
+    return sum;
   }, 0);
+
 
 
   const stats = [
@@ -207,11 +216,13 @@ export default function Dashboard() {
                 >
                   <div className="flex items-center gap-3">
                     <div
-                      className={`p-2 rounded-full ${order.status === "completed"
+                      className={`p-2 rounded-full ${order.status === "DELIVERED"
                         ? "bg-success/10 text-success"
-                        : order.status === "in-progress"
+                        : order.status === "PICKED_UP"
                           ? "bg-warning/10 text-warning"
-                          : "bg-muted text-admin-text-secondary"
+                          : order.status === "CANCELLED"
+                            ? "bg-warning/10 text-red-500"
+                            : "bg-muted text-admin-text-secondary"
                         }`}
                     >
                       {order.status === "completed" ? (
@@ -237,11 +248,13 @@ export default function Dashboard() {
                       {order.amount}
                     </p>
                     <span
-                      className={`text-xs px-2 py-1 rounded-full ${order.status === "completed"
+                      className={`text-xs px-2 py-1 rounded-full ${order.status === "DELIVERED"
                         ? "bg-success/10 text-success"
-                        : order.status === "in-progress"
+                        : order.status === "PICKED_UP"
                           ? "bg-warning/10 text-warning"
-                          : "bg-muted text-admin-text-secondary"
+                          : order.status === "CANCELLED"
+                            ? "bg-warning/10 text-red-500"
+                            : "bg-muted text-admin-text-secondary"
                         }`}
                     >
                       {order.status.replace("-", " ")}

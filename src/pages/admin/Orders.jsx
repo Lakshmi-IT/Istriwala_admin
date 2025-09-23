@@ -170,7 +170,6 @@ export default function Orders() {
       console.log(res.data, "res")
 
       if (res.status === 200) {
-
         const employees = res?.data?.map((emp) => ({
           empId: emp?.employeeId,
           empName: emp?.fullName,
@@ -397,7 +396,7 @@ export default function Orders() {
 
 
 
-  console.log(selectedOrder, "selectedOrder")
+
 
 
 
@@ -615,7 +614,7 @@ export default function Orders() {
               {/* Address */}
               <div className="bg-gray-50 p-2 sm:p-3 rounded-lg">
                 <p className="text-gray-500 text-xs">Address</p>
-                <p className="font-medium">{selectedOrder.address}</p>
+                <p className="font-medium">{selectedOrder?.address}</p>
 
                 <button
                   onClick={openRouteModal}

@@ -184,10 +184,7 @@ export default function Users() {
                     </TableCell>
                     <TableCell>
                       <div className="space-y-1">
-                        <div className="flex items-center gap-2 text-sm">
-                          <Mail className="h-3 w-3 text-admin-text-secondary" />
-                          <span className="text-admin-text-secondary">{user.email}</span>
-                        </div>
+                       
                         <div className="flex items-center gap-2 text-sm">
                           <Phone className="h-3 w-3 text-admin-text-secondary" />
                           <span className="text-admin-text-secondary">{user.phone}</span>
